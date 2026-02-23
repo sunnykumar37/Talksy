@@ -29,8 +29,8 @@ export function Sidebar({ onSelectConversation, selectedId, onOpenUserList, curr
             {/* Premium Header */}
             <div className="p-4 px-6 flex justify-between items-center sticky top-0 glass-morphism z-20 border-b border-slate-50 shadow-sm">
                 <div className="flex flex-col">
-                    <h1 className="text-2xl font-black bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tighter">Talksy</h1>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-0.5">Premium Messaging</span>
+                    <h1 className="text-2xl font-black bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tighter">Talksy</h1>
+                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] leading-none mt-0.5">Premium Messaging</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -53,13 +53,13 @@ export function Sidebar({ onSelectConversation, selectedId, onOpenUserList, curr
             <div className="flex-1 overflow-y-auto custom-scrollbar pt-2 px-1">
 
                 {conversations === undefined ? (
-                    <div className="p-4 text-center text-gray-500 text-sm">Loading conversations...</div>
+                    <div className="p-4 text-center text-slate-400 text-sm font-medium">Loading conversations...</div>
                 ) : conversations.length === 0 ? (
                     <div className="p-8 text-center">
-                        <div className="text-gray-400 mb-2 italic">No conversations yet.</div>
+                        <div className="text-slate-400 mb-2 italic font-medium">No conversations yet.</div>
                         <button
                             onClick={onOpenUserList}
-                            className="text-blue-500 text-sm font-semibold hover:underline"
+                            className="text-blue-600 text-sm font-bold hover:underline"
                         >
                             Start chatting!
                         </button>

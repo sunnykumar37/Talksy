@@ -55,17 +55,20 @@ export const getMessages = query({
             return [];
         }
 
-        return await ctx.db
+        const messages = await ctx.db
             .query("messages")
             .withIndex("by_conversationId", (q) =>
                 q.eq("conversationId", args.conversationId)
             )
             .collect();
+
+        // Filter out messages deleted "for me"
+        return messages.filter(m => !m.deletedFor?.includes(user._id));
     }
 });
 
 
-export const deleteMessage = mutation({
+export const deleteForEveryone = mutation({
     args: { messageId: v.id("messages") },
     handler: async (ctx, args) => {
         const user = await getCurrentUser(ctx);
@@ -75,7 +78,7 @@ export const deleteMessage = mutation({
         if (!message) throw new Error("Message not found");
 
         if (message.senderId !== user._id) {
-            throw new Error("Unauthorized to delete this message");
+            throw new Error("Unauthorized: Only sender can delete for everyone");
         }
 
         await ctx.db.patch(args.messageId, {
@@ -85,7 +88,26 @@ export const deleteMessage = mutation({
     },
 });
 
+export const deleteForMe = mutation({
+    args: { messageId: v.id("messages") },
+    handler: async (ctx, args) => {
+        const user = await getCurrentUser(ctx);
+        if (!user) throw new Error("Not authenticated");
+
+        const message = await ctx.db.get(args.messageId);
+        if (!message) throw new Error("Message not found");
+
+        const deletedFor = message.deletedFor || [];
+        if (!deletedFor.includes(user._id)) {
+            await ctx.db.patch(args.messageId, {
+                deletedFor: [...deletedFor, user._id],
+            });
+        }
+    },
+});
+
 export const getLastMessage = query({
+
     args: { conversationId: v.id("conversations") },
     handler: async (ctx, args) => {
         return await ctx.db

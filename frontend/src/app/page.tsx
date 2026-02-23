@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="h-screen w-full bg-slate-100 flex items-center justify-center p-0 md:p-6 lg:p-10 transition-all duration-500 ease-in-out">
-      <main className="flex h-full max-h-[900px] w-full max-w-6xl bg-white shadow-2xl rounded-none md:rounded-3xl overflow-hidden border border-slate-200/60 relative group">
+      <main className="flex h-full max-h-[900px] w-full max-w-6xl bg-white/90 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] rounded-none md:rounded-3xl overflow-hidden border border-white/20 relative group">
         {/* Sidebar - Fixed width on large screens */}
         <div className={`w-full md:w-[320px] lg:w-[360px] flex-shrink-0 border-r border-slate-100 bg-white flex flex-col transition-all duration-300 ${selectedConversationId ? "hidden md:flex" : "flex"
           }`}>
@@ -44,8 +44,8 @@ export default function Home() {
         </div>
 
         {/* Main Chat Area - Premium responsive expansion */}
-        <div className={`flex-1 flex flex-col bg-slate-50/30 ${!selectedConversationId ? "hidden md:flex" : "flex"
-          }`}>
+        <div className={`flex-1 flex flex-col bg-white/50 animate-switch ${!selectedConversationId ? "hidden md:flex" : "flex"
+          }`} key={selectedConversationId || "empty"}>
           {selectedConversationId ? (
             <ChatWindow
               conversationId={selectedConversationId}

@@ -27,23 +27,14 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
   );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingUsers = useQuery(api.conversations.getTypingUsers, { conversationId });
+  const setTyping = useMutation(api.conversations.setTyping);
 
   // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  if (conversation === undefined || messages === undefined || currentUser === undefined) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50 text-gray-400">
-        Loading chat...
-      </div>
-    );
-  }
-
-  const [isTyping, setIsTyping] = useState(false);
-  const typingUsers = useQuery(api.conversations.getTypingUsers, { conversationId });
-  const setTyping = useMutation(api.conversations.setTyping);
 
   // Typing Indicator Logic
   useEffect(() => {
@@ -66,7 +57,18 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [content, conversationId]);
+  }, [content, conversationId, isTyping, setTyping]);
+
+  if (conversation === undefined || messages === undefined || currentUser === undefined) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-slate-50 text-slate-400 font-medium text-sm tracking-wide">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
+          Loading secure chat...
+        </div>
+      </div>
+    );
+  }
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,15 +87,18 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
     }
   };
 
+
   if (conversation === null || currentUser === null) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50 text-gray-400">
+      <div className="flex-1 flex items-center justify-center bg-slate-50 text-slate-400 font-medium">
         {currentUser === null ? "Identity not found." : "Conversation not found."}
       </div>
     );
   }
 
+
   const otherTypingUsers = typingUsers?.filter(name => name !== currentUser?.name) || [];
+
 
   return (
     <div className="flex flex-col h-full bg-slate-50 relative overflow-hidden transition-all duration-300">

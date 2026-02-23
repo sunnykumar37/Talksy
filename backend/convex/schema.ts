@@ -29,8 +29,10 @@ export default defineSchema({
         senderId: v.id("users"),
         content: v.string(),
         createdAt: v.number(),
-        deleted: v.boolean(),
+        deleted: v.boolean(), // for "Delete for Everyone"
+        deletedFor: v.optional(v.array(v.id("users"))), // for "Delete for Me"
     }).index("by_conversationId", ["conversationId"]),
+
 
     conversationMembers: defineTable({
         conversationId: v.id("conversations"),
