@@ -21,10 +21,10 @@ export default function Home() {
   if (!clerkUser) return null;
 
   return (
-    <div className="h-screen w-full bg-slate-100 flex items-center justify-center p-0 md:p-6 lg:p-10 transition-all duration-500 ease-in-out">
-      <main className="flex h-full max-h-[900px] w-full max-w-6xl bg-white/90 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] rounded-none md:rounded-3xl overflow-hidden border border-white/20 relative group">
+    <div className="h-screen w-full bg-[var(--background)] flex items-center justify-center p-0 md:p-6 lg:p-10 transition-all duration-500 ease-in-out">
+      <main className="flex h-full max-h-[900px] w-full max-w-6xl bg-[var(--card)] shadow-2xl rounded-none md:rounded-3xl overflow-hidden border border-[var(--card-border)] relative group transition-colors duration-300">
         {/* Sidebar - Fixed width on large screens */}
-        <div className={`w-full md:w-[320px] lg:w-[360px] flex-shrink-0 border-r border-slate-100 bg-white flex flex-col transition-all duration-300 ${selectedConversationId ? "hidden md:flex" : "flex"
+        <div className={`w-full md:w-[320px] lg:w-[360px] flex-shrink-0 border-r border-[var(--card-border)] bg-[var(--card)] flex flex-col transition-all duration-300 ${selectedConversationId ? "hidden md:flex" : "flex"
           }`}>
           {isUserListOpen ? (
             <UserList
@@ -44,7 +44,7 @@ export default function Home() {
         </div>
 
         {/* Main Chat Area - Premium responsive expansion */}
-        <div className={`flex-1 flex flex-col bg-white/50 animate-switch ${!selectedConversationId ? "hidden md:flex" : "flex"
+        <div className={`flex-1 flex flex-col bg-[var(--background)] animate-switch ${!selectedConversationId ? "hidden md:flex" : "flex"
           }`} key={selectedConversationId || "empty"}>
           {selectedConversationId ? (
             <ChatWindow
@@ -54,12 +54,12 @@ export default function Home() {
             />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-12 text-center animate-in fade-in duration-700">
-              <div className="w-24 h-24 bg-gradient-to-tr from-blue-50 to-indigo-50 text-blue-600 rounded-full flex items-center justify-center mb-8 shadow-inner ring-4 ring-white relative">
+              <div className="w-24 h-24 bg-gradient-to-tr from-blue-500/10 to-indigo-500/10 text-blue-600 rounded-full flex items-center justify-center mb-8 shadow-inner ring-4 ring-white dark:ring-slate-800 relative">
                 <div className="absolute inset-0 bg-blue-500/5 rounded-full animate-ping opacity-20" />
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
               </div>
-              <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight mb-3">Welcome to Talksy</h2>
-              <p className="text-slate-500 max-w-sm leading-relaxed text-sm md:text-base">
+              <h2 className="text-3xl font-extrabold text-[var(--foreground)] tracking-tight mb-3">Welcome to Talksy</h2>
+              <p className="text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed text-sm md:text-base font-medium">
                 A modern way to connect with friends. Select a conversation to start a seamless real-time chat experience.
               </p>
               <button
@@ -75,4 +75,5 @@ export default function Home() {
       </main>
     </div>
   );
+
 }

@@ -30,6 +30,32 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
   const [isTyping, setIsTyping] = useState(false);
   const typingUsers = useQuery(api.conversations.getTypingUsers, { conversationId });
   const setTyping = useMutation(api.conversations.setTyping);
+  const markAsSeen = useMutation(api.messages.markAsSeen);
+  const lastMessageId = useRef<string | null>(null);
+
+  // Mark as seen & play sound when messages change
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+
+      // Sound logic
+      if (lastMessageId.current && lastMsg._id !== lastMessageId.current) {
+        if (lastMsg.senderId !== currentUser?._id) {
+          const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3");
+          audio.volume = 0.5;
+          audio.play().catch(e => console.log("Audio play failed:", e));
+        }
+      }
+      lastMessageId.current = lastMsg._id;
+
+      // Seen logic
+      const hasUnseen = messages.some(m => !m.seenBy?.includes(currentUser?._id));
+      if (hasUnseen) {
+        markAsSeen({ conversationId });
+      }
+    }
+  }, [messages, conversationId, currentUser?._id, markAsSeen]);
+
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -101,34 +127,34 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
 
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 relative overflow-hidden transition-all duration-300">
+    <div className="flex flex-col h-full bg-[var(--background)] relative overflow-hidden transition-all duration-300">
       {/* Premium Sticky Header */}
-      <div className="p-4 px-6 border-b border-slate-100 glass-morphism sticky top-0 z-30 flex items-center justify-between shadow-sm">
+      <div className="p-4 px-6 border-b border-[var(--card-border)] glass-morphism sticky top-0 z-30 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4 group cursor-pointer">
-          <button onClick={onBack} className="md:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-all duration-300">
+          <button onClick={onBack} className="md:hidden p-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-all duration-300">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="relative group/avatar">
-            <div className="w-12 h-12 rounded-full bg-slate-100 ring-2 ring-white overflow-hidden shadow-md transition-all duration-300 group-hover/avatar:scale-110 group-hover/avatar:rotate-3">
+            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 ring-2 ring-white dark:ring-slate-900 overflow-hidden shadow-md transition-all duration-300 group-hover/avatar:scale-110 group-hover/avatar:rotate-3">
               {otherUser?.imageUrl ? (
                 <img src={otherUser.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-slate-200">
+                <div className="w-full h-full flex items-center justify-center bg-slate-200 dark:bg-slate-700">
                   <span className="text-slate-400 font-bold">{conversation.isGroup ? "G" : (otherUser?.name?.charAt(0) || "?")}</span>
                 </div>
               )}
             </div>
             {!conversation.isGroup && otherUser?.isOnline && (
-              <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+              <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-900 shadow-sm" />
             )}
           </div>
           <div>
-            <div className="text-lg font-bold text-slate-800 leading-tight tracking-tight group-hover:text-blue-600 transition-colors">
+            <div className="text-lg font-bold text-[var(--foreground)] leading-tight tracking-tight group-hover:text-blue-600 transition-colors">
               {conversation.isGroup ? conversation.name : otherUser?.name || "..."}
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               {!conversation.isGroup && otherUser?.isOnline && <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />}
-              <div className={`text-[11px] font-bold uppercase tracking-widest ${otherUser?.isOnline ? 'text-green-500' : 'text-slate-400'}`}>
+              <div className={`text-[11px] font-bold uppercase tracking-widest ${otherUser?.isOnline ? 'text-green-500' : 'text-slate-400 dark:text-slate-500'}`}>
                 {conversation.isGroup ? `${conversation.members.length} members` : (otherUser?.isOnline ? "Active Now" : "Last seen recently")}
               </div>
             </div>
@@ -137,14 +163,14 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
       </div>
 
       {/* Messages Stream - Subtle Gradient Background */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col custom-scrollbar bg-gradient-to-b from-slate-50 to-white/50 relative">
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col custom-scrollbar bg-gradient-to-b from-[var(--background)] to-[var(--background)] relative">
         {messages.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center flex-col text-slate-300 animate-in fade-in zoom-in duration-500">
-            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 shadow-inner ring-4 ring-white">
+          <div className="flex-1 flex items-center justify-center flex-col text-slate-300 dark:text-slate-700 animate-in fade-in zoom-in duration-500">
+            <div className="w-20 h-20 bg-[var(--card)] rounded-full flex items-center justify-center mb-6 shadow-inner ring-4 ring-white dark:ring-slate-800">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
             </div>
-            <p className="text-base font-bold text-slate-400">Start your premium conversation</p>
-            <p className="text-xs text-slate-300 mt-1 uppercase tracking-widest">Messages are end-to-end synced</p>
+            <p className="text-base font-bold text-slate-400 dark:text-slate-500">Start your premium conversation</p>
+            <p className="text-xs text-slate-300 dark:text-slate-600 mt-1 uppercase tracking-widest">Messages are end-to-end synced</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -160,15 +186,15 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
         <div ref={messagesEndRef} className="h-4" />
       </div>
 
-      {/* Typing Indicator - Improved Visibility & Correct Logic */}
-      <div className={`px-8 py-3 bg-gradient-to-t from-white to-transparent absolute bottom-[92px] left-0 right-0 z-20 transition-all duration-300 ease-in-out ${otherTypingUsers.length > 0 ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
-        <div className="flex items-center gap-2 text-blue-600/80 text-xs font-bold italic drop-shadow-sm">
-          <div className="flex gap-1 bg-blue-50 px-2 py-1 rounded-full shadow-sm">
+      {/* Typing Indicator */}
+      <div className={`px-8 py-3 bg-gradient-to-t from-[var(--background)] to-transparent absolute bottom-[92px] left-0 right-0 z-20 transition-all duration-300 ease-in-out ${otherTypingUsers.length > 0 ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
+        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-xs font-bold italic drop-shadow-sm">
+          <div className="flex gap-1 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-full shadow-sm">
             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
             <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
           </div>
-          <span className="bg-white/80 backdrop-blur-sm px-2 py-1 rounded-lg">
+          <span className="bg-[var(--card)]/80 backdrop-blur-sm px-2 py-1 rounded-lg">
             {otherTypingUsers.length === 1
               ? `${otherTypingUsers[0]} is typing...`
               : `${otherTypingUsers.length} people are typing...`}
@@ -177,9 +203,9 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
       </div>
 
       {/* Premium Input Section */}
-      <div className="p-4 md:p-6 bg-white border-t border-slate-100 sticky bottom-0 z-30 shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+      <div className="p-4 md:p-6 bg-[var(--card)] border-t border-[var(--card-border)] sticky bottom-0 z-30 shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
         <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-end gap-4">
-          <div className="flex-1 bg-slate-100 hover:bg-slate-200/50 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-100 border border-transparent rounded-2xl transition-all duration-300 shadow-inner px-5 py-2.5 flex items-center min-h-[52px] group/input">
+          <div className="flex-1 bg-[var(--input)] hover:bg-slate-200/50 dark:hover:bg-slate-800/50 focus-within:bg-[var(--card)] focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-100 dark:focus-within:border-blue-900 border border-transparent rounded-2xl transition-all duration-300 shadow-inner px-5 py-2.5 flex items-center min-h-[52px] group/input">
             <textarea
               rows={1}
               value={content}
@@ -191,16 +217,18 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
                 }
               }}
               placeholder="Type a modern message..."
-              className="flex-1 bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-sm md:text-base resize-none py-1 group-focus-within/input:placeholder:text-blue-300"
+              className="flex-1 bg-transparent border-none outline-none text-[var(--foreground)] placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm md:text-base resize-none py-1 group-focus-within/input:placeholder:text-blue-300"
             />
           </div>
+
           <button
             type="submit"
             disabled={!content.trim()}
-            className="bg-blue-600 text-white p-4 rounded-2xl hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 transition-all duration-300 shadow-xl shadow-blue-200/50 disabled:shadow-none hover:scale-105 active:scale-90 group/btn shrink-0"
+            className="bg-blue-600 text-white p-4 rounded-2xl hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 transition-all duration-300 shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)] hover:shadow-[0_15px_25px_-5px_rgba(37,99,235,0.5)] disabled:shadow-none hover:scale-110 active:scale-90 group/btn shrink-0 border border-blue-500/20"
           >
-            <Send className="w-6 h-6 group-hover/btn:rotate-12 transition-transform" />
+            <Send className="w-6 h-6 group-hover/btn:rotate-12 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
           </button>
+
         </form>
       </div>
     </div>

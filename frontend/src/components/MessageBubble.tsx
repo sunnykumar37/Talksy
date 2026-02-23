@@ -35,20 +35,25 @@ export function MessageBubble({ message, currentUser }: MessageBubbleProps) {
             <div className={`relative flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[75%] md:max-w-md lg:max-w-lg`}>
                 <div
                     className={`px-5 py-3 shadow-md transition-all duration-300 group-hover:shadow-xl ${isMe
-                        ? "bg-blue-100 text-slate-900 rounded-2xl rounded-br-sm shadow-blue-500/10 border border-blue-200"
-                        : "bg-white text-slate-800 rounded-2xl rounded-bl-sm border border-slate-200 shadow-slate-200/50"
+                        ? "bg-[var(--bubble-me)] text-[var(--bubble-me-text)] rounded-2xl rounded-br-sm shadow-blue-500/10 border border-blue-200 dark:border-blue-900/30"
+                        : "bg-[var(--bubble-them)] text-[var(--bubble-them-text)] rounded-2xl rounded-bl-sm border border-slate-200 dark:border-slate-800 shadow-slate-200/50"
                         }`}
                 >
                     <div className="text-[15px] leading-relaxed break-words font-medium tracking-tight">
                         {message.content}
                     </div>
                     <div
-                        className={`text-[10px] mt-2 flex justify-end font-bold tracking-widest uppercase items-center gap-1 ${isMe ? "text-blue-500/70" : "text-slate-400"
+                        className={`text-[10px] mt-2 flex justify-end font-bold tracking-widest uppercase items-center gap-1 ${isMe ? "text-blue-500/70" : "text-slate-400 dark:text-slate-500"
                             }`}
                     >
                         {formatTimestamp(message.createdAt)}
                         {isMe && (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-80"><path d="M20 6 9 17l-5-5" /></svg>
+                            <div className="flex -space-x-1.5 items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={message.seenBy?.length > 1 ? "text-[var(--accent)]" : "opacity-80"}><path d="M20 6 9 17l-5-5" /></svg>
+                                {message.seenBy?.length > 1 && (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--accent)]"><path d="M20 6 9 17l-5-5" /></svg>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

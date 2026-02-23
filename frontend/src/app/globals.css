@@ -5,6 +5,40 @@
   /* Slate 50 */
   --foreground: #0f172a;
   /* Slate 900 */
+  --card: #ffffff;
+  --card-border: #f1f5f9;
+  --input: #f1f5f9;
+  --accent: #2563eb;
+  /* Blue 600 */
+  --muted: #64748b;
+  /* Slate 500 */
+  --bubble-me: #dbeafe;
+  /* Blue 100 */
+  --bubble-them: #ffffff;
+  --bubble-me-text: #0f172a;
+  --bubble-them-text: #1e293b;
+}
+
+.dark {
+  --background: #020617;
+  /* Slate 950 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
+  --card: #0f172a;
+  /* Slate 900 */
+  --card-border: #1e293b;
+  /* Slate 800 */
+  --input: #1e293b;
+  --accent: #3b82f6;
+  /* Blue 500 */
+  --muted: #94a3b8;
+  /* Slate 400 */
+  --bubble-me: #1e293b;
+  /* Slate 800 */
+  --bubble-them: #0f172a;
+  /* Slate 900 */
+  --bubble-me-text: #f8fafc;
+  --bubble-them-text: #f1f5f9;
 }
 
 @theme inline {
@@ -20,16 +54,18 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   overflow: hidden;
   height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Glassmorphism utility */
 .glass-morphism {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  opacity: 0.95;
 }
 
-/* Custom Scrollbar - Minimal and subtle */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -39,15 +75,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  /* Slate 200 */
+  background: var(--card-border);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
-  /* Slate 300 */
+  background: var(--muted);
 }
+
 
 @keyframes message-appear {
   from {
@@ -58,6 +93,33 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shine {
+  from {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+
+  to {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
   }
 }
 
@@ -81,4 +143,28 @@ body {
 
 .animate-switch {
   animation: switch-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: translateX(-100%) skewX(-15deg);
+}
+
+.animate-shine:hover::after {
+  animation: shine 0.7s ease-in-out;
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s infinite ease-in-out;
 }

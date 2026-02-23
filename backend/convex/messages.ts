@@ -17,7 +17,9 @@ export const sendMessage = mutation({
             content: args.content,
             createdAt: Date.now(),
             deleted: false,
+            seenBy: [user._id], // Sender has seen it
         });
+
 
         await ctx.db.patch(args.conversationId, {
             lastMessageId: messageId,
@@ -117,3 +119,27 @@ export const getLastMessage = query({
             .first();
     },
 });
+
+export const markAsSeen = mutation({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, args) => {
+        const user = await getCurrentUser(ctx);
+        if (!user) throw new Error("Not authenticated");
+
+        const messages = await ctx.db
+            .query("messages")
+            .withIndex("by_conversationId", (q) =>
+                q.eq("conversationId", args.conversationId)
+            )
+            .collect();
+
+        for (const message of messages) {
+            if (!message.seenBy.includes(user._id)) {
+                await ctx.db.patch(message._id, {
+                    seenBy: [...message.seenBy, user._id],
+                });
+            }
+        }
+    },
+});
+
