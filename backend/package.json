@@ -1,0 +1,9 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "convex": "^1.8.0",
+        "@clerk/clerk-sdk-node": "^4.13.1"
+    }
+}
