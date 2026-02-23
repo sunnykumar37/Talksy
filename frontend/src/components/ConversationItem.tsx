@@ -27,14 +27,12 @@ export function ConversationItem({ conversation, isSelected, onClick, currentUse
     return (
         <button
             onClick={onClick}
-            className={`w-full flex items-center gap-4 p-3 px-5 transition-all duration-200 border-b border-slate-50/50 hover:bg-slate-50 group relative ${isSelected ? "bg-blue-50/80" : "bg-white"
+            className={`w-full flex items-center gap-4 p-3.5 px-5 transition-all duration-300 group relative rounded-xl my-0.5 ${isSelected ? "bg-blue-50/60 border-l-4 border-blue-600 shadow-sm" : "bg-transparent hover:bg-slate-50 border-l-4 border-transparent"
                 }`}
         >
-            {isSelected && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-blue-600 rounded-r-full" />}
-
             <div className="relative flex-shrink-0">
-                <div className={`w-14 h-14 rounded-full overflow-hidden bg-slate-100 ring-2 ${isSelected ? "ring-blue-200 shadow-lg shadow-blue-100" : "ring-slate-50"
-                    } transition-all group-hover:shadow-md`}>
+                <div className={`w-14 h-14 rounded-full overflow-hidden bg-slate-100 ring-2 ${isSelected ? "ring-blue-200 shadow-lg shadow-blue-100 scale-105" : "ring-slate-50"
+                    } transition-all duration-300 group-hover:scale-105 shadow-sm`}>
                     {imageUrl ? (
                         <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
                     ) : (
@@ -44,22 +42,23 @@ export function ConversationItem({ conversation, isSelected, onClick, currentUse
                     )}
                 </div>
                 {!conversation.isGroup && otherUser?.isOnline && (
-                    <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm" />
+                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow-sm ring-1 ring-emerald-50" />
                 )}
             </div>
-            <div className="flex-1 text-left min-w-0 py-1">
-                <div className="flex justify-between items-baseline gap-2 mb-1">
-                    <div className={`font-bold truncate ${isSelected ? "text-blue-900" : "text-slate-800"}`}>{name}</div>
-                    <div className="text-[11px] font-medium text-slate-400 uppercase tracking-tighter whitespace-nowrap">
+            <div className="flex-1 text-left min-w-0 py-1 flex flex-col justify-center">
+                <div className="flex justify-between items-baseline gap-2 mb-0.5">
+                    <div className={`font-bold transition-colors ${isSelected ? "text-blue-900" : "text-slate-800"}`}>{name}</div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
                         {formatShortTimestamp(conversation.updatedAt)}
                     </div>
                 </div>
-                <div className={`text-xs truncate leading-tight ${isSelected ? "text-blue-700 font-medium" : "text-slate-500"
+                <div className={`text-xs truncate leading-tight transition-colors ${isSelected ? "text-blue-700 font-semibold" : "text-slate-500"
                     }`}>
-                    {lastMessage ? lastMessage.content : "Start a new chat"}
+                    {lastMessage ? lastMessage.content : "Start a new conversation"}
                 </div>
             </div>
         </button>
     );
+
 
 }

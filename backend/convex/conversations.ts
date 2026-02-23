@@ -124,3 +124,62 @@ export const getConversationById = query({
     },
 });
 
+export const setTyping = mutation({
+    args: {
+        conversationId: v.id("conversations"),
+        isTyping: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const user = await getCurrentUser(ctx);
+        if (!user) throw new Error("Not authenticated");
+
+        const existing = await ctx.db
+            .query("typingIndicators")
+            .withIndex("by_conversationId_and_userId", (q) =>
+                q.eq("conversationId", args.conversationId).eq("userId", user._id)
+            )
+            .unique();
+
+        if (args.isTyping) {
+            if (existing) {
+                await ctx.db.patch(existing._id, { lastUpdated: Date.now() });
+            } else {
+                await ctx.db.insert("typingIndicators", {
+                    conversationId: args.conversationId,
+                    userId: user._id,
+                    lastUpdated: Date.now(),
+                });
+            }
+        } else {
+            if (existing) {
+                await ctx.db.delete(existing._id);
+            }
+        }
+    },
+});
+
+export const getTypingUsers = query({
+    args: { conversationId: v.id("conversations") },
+    handler: async (ctx, args) => {
+        const indicators = await ctx.db
+            .query("typingIndicators")
+            .withIndex("by_conversationId", (q) =>
+                q.eq("conversationId", args.conversationId)
+            )
+            .collect();
+
+        const fiveSecondsAgo = Date.now() - 5000;
+        const activeIndicators = indicators.filter((i) => i.lastUpdated > fiveSecondsAgo);
+
+        const users = await Promise.all(
+            activeIndicators.map(async (i) => {
+                const user = await ctx.db.get(i.userId);
+                return user?.name || "Someone";
+            })
+        );
+
+        return users;
+    },
+});
+
+

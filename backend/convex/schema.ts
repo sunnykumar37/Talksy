@@ -40,4 +40,14 @@ export default defineSchema({
         .index("by_conversationId", ["conversationId"])
         .index("by_userId", ["userId"])
         .index("by_conversationId_and_userId", ["conversationId", "userId"]),
+
+    typingIndicators: defineTable({
+        conversationId: v.id("conversations"),
+        userId: v.id("users"),
+        lastUpdated: v.number(), // timestamp for cleanup
+    })
+        .index("by_conversationId", ["conversationId"])
+        .index("by_userId", ["userId"])
+        .index("by_conversationId_and_userId", ["conversationId", "userId"]),
 });
+
