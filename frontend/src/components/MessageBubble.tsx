@@ -13,8 +13,8 @@ export function MessageBubble({ message, currentUser }: MessageBubbleProps) {
 
     if (message.deleted) {
         return (
-            <div className={`flex ${isMe ? "justify-end" : "justify-start"} mb-4`}>
-                <div className="max-w-[70%] rounded-lg px-4 py-2 bg-gray-100 text-gray-400 italic text-sm border-none">
+            <div className={`flex ${isMe ? "justify-end" : "justify-start"} mb-2`}>
+                <div className="max-w-[80%] rounded-2xl px-4 py-2 bg-slate-50 text-slate-400 italic text-xs border border-slate-100">
                     This message was deleted
                 </div>
             </div>
@@ -22,18 +22,19 @@ export function MessageBubble({ message, currentUser }: MessageBubbleProps) {
     }
 
     return (
-        <div className={`flex ${isMe ? "justify-end" : "justify-start"} mb-4`}>
+        <div className={`flex ${isMe ? "justify-end" : "justify-start"} mb-2 group px-2`}>
             <div
-                className={`px-4 py-2 rounded-lg max-w-[85%] md:max-w-xs shadow-sm ${isMe
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-black"
-                    }`}
+                className={`px-4 py-2.5 shadow-sm transition-all duration-200 hover:shadow-md ${isMe
+                    ? "bg-blue-600 text-white rounded-2xl rounded-tr-sm"
+                    : "bg-white text-slate-800 rounded-2xl rounded-tl-sm border border-slate-100"
+                    } max-w-[85%] md:max-w-md lg:max-w-lg shadow-blue-50/50`}
             >
-                <div className="text-sm md:text-base leading-relaxed break-words">
+                <div className="text-sm md:text-[15px] leading-relaxed break-words font-medium">
                     {message.content}
                 </div>
                 <div
-                    className={`text-[10px] mt-1 text-right ${isMe ? "text-blue-100" : "text-gray-500"}`}
+                    className={`text-[10px] mt-1 text-right font-medium tracking-tight ${isMe ? "text-blue-100/80" : "text-slate-400"
+                        }`}
                 >
                     {formatTimestamp(message.createdAt)}
                 </div>
@@ -41,3 +42,4 @@ export function MessageBubble({ message, currentUser }: MessageBubbleProps) {
         </div>
     );
 }
+

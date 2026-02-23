@@ -21,29 +21,33 @@ export function Sidebar({ onSelectConversation, selectedId, onOpenUserList, curr
 
     const filteredConversations = conversations?.filter((c) => {
         if (!search) return true;
-        // Basic search - ideally would search by member names
         return c.name?.toLowerCase().includes(search.toLowerCase());
     });
 
     return (
-        <div className="flex flex-col h-full bg-white border-r">
-            <div className="p-4 flex justify-between items-center border-b">
-                <h1 className="text-xl font-bold text-blue-600">Talksy</h1>
-                <div className="flex items-center gap-2">
+        <div className="flex flex-col h-full bg-white relative">
+            <div className="p-4 px-6 flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-slate-50">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">Talksy</h1>
+                <div className="flex items-center gap-3">
                     <button
                         onClick={onOpenUserList}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2.5 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-full transition-all duration-200 active:scale-95"
                         title="New Chat"
                     >
-                        <Plus className="w-5 h-5 text-gray-600" />
+                        <Plus className="w-5 h-5" />
                     </button>
-                    <UserButton afterSignOutUrl="/" />
+                    <div className="ring-2 ring-slate-100 rounded-full p-0.5">
+                        <UserButton afterSignOutUrl="/" />
+                    </div>
                 </div>
             </div>
 
-            <SearchBar value={search} onChange={setSearch} placeholder="Search chats..." />
+            <div className="px-4 py-2">
+                <SearchBar value={search} onChange={setSearch} placeholder="Search messages..." />
+            </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto custom-scrollbar pt-2">
+
                 {conversations === undefined ? (
                     <div className="p-4 text-center text-gray-500 text-sm">Loading conversations...</div>
                 ) : conversations.length === 0 ? (
