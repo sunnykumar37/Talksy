@@ -27,69 +27,69 @@ export function Sidebar({ onSelectConversation, selectedId, onOpenUserList, curr
     });
 
     return (
-        <div className="flex flex-col h-full bg-[var(--card)] relative transition-all duration-300">
-            {/* Premium Header */}
-            <div className="p-4 px-6 flex justify-between items-center sticky top-0 glass-morphism z-20 border-b border-[var(--card-border)] shadow-sm">
-                <div className="flex flex-col group cursor-pointer">
-                    <h1 className="text-2xl font-black bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tighter animate-shine">Talksy</h1>
-                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] leading-none mt-0.5 group-hover:text-blue-500 transition-colors">Premium Messaging</span>
+        <div className="w-full md:w-80 lg:w-96 flex flex-col h-full bg-[var(--card)] border-r border-[var(--card-border)] relative overflow-hidden group/sidebar">
+            {/* Subtle Neon Edge Glow */}
+            <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-blue-500/20 to-transparent group-hover/sidebar:via-blue-500/40 transition-all duration-1000" />
+
+            {/* Premium Header - Standardized Height & Centered Content */}
+            <div className="h-[88px] px-6 flex items-center justify-between sticky top-0 glass-morphism z-30 border-b border-[var(--card-border)] shadow-sm">
+                <div className="flex flex-col justify-center">
+                    <h1 className="text-2xl font-black bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tighter animate-shine leading-none">Talksy</h1>
+                    <span className="text-[10px] font-extrabold text-[var(--muted)] uppercase tracking-[0.2em] leading-none mt-1.5 group-hover:text-[var(--accent)] transition-colors">Premium Messaging</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <ThemeToggle />
                     <button
                         onClick={onOpenUserList}
-                        className="p-2.5 bg-[var(--input)] hover:bg-blue-50 dark:hover:bg-blue-900/30 text-[var(--muted)] hover:text-blue-600 rounded-full transition-all duration-300 active:scale-90 hover:rotate-90 group"
-                        title="New Chat"
+                        className="p-2.5 rounded-full text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--card-border)] transition-all duration-300 active:scale-90"
                     >
-                        <Plus className="w-5 h-5 group-hover:scale-110" />
+                        <Plus className="w-5 h-5" />
                     </button>
-                    <div className="ring-2 ring-[var(--card-border)] rounded-full p-0.5 hover:ring-blue-100 transition-all cursor-pointer">
-                        <UserButton afterSignOutUrl="/" />
-                    </div>
+                    <UserButton afterSignOutUrl="/" />
                 </div>
             </div>
 
+            {/* Scanline / Grain Overlay for depth (optional but adds texture) */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-            <div className="px-5 py-3">
+            <div className="p-3 mt-1">
                 <SearchBar value={search} onChange={setSearch} placeholder="Search messages..." />
             </div>
 
-            {/* Conversations List */}
-            <div className="flex-1 overflow-y-auto px-2 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10 p-2 space-y-1">
                 {filteredConversations === undefined ? (
-                    <div className="flex flex-col gap-3 p-4">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="w-full h-16 bg-[var(--input)] animate-pulse rounded-2xl" />
-                        ))}
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <div className="w-12 h-12 border-4 border-[var(--accent)]/30 border-t-[var(--accent)] rounded-full animate-spin shadow-lg" />
+                        <p className="text-xs font-black uppercase tracking-widest text-[var(--muted)] animate-pulse">Syncing Conversations</p>
                     </div>
                 ) : filteredConversations.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-64 text-center p-8">
-                        <div className="w-16 h-16 bg-[var(--input)] rounded-full flex items-center justify-center mb-4 text-[var(--muted)]">
-                            <Plus className="w-6 h-6 opacity-20" />
+                    <div className="flex flex-col items-center justify-center p-8 py-20 text-center glass-morphism rounded-3xl mx-2 border border-[var(--card-border)] shadow-xl">
+                        <div className="w-16 h-16 bg-[var(--input)] rounded-full flex items-center justify-center mb-4 ring-1 ring-[var(--card-border)]">
+                            <Plus className="w-8 h-8 text-[var(--muted)]" />
                         </div>
-                        <p className="text-sm font-bold text-[var(--muted)] uppercase tracking-widest">No chats found</p>
+                        <h3 className="text-[var(--foreground)] font-black mb-1">No chats found</h3>
+                        <p className="text-xs text-[var(--muted)] font-bold uppercase tracking-tighter">Start your first premium chat</p>
                         <button
                             onClick={onOpenUserList}
-                            className="mt-4 text-xs font-black text-blue-600 hover:text-blue-700 underline underline-offset-4 uppercase tracking-tighter"
+                            className="mt-6 px-6 py-2.5 bg-[var(--accent)] hover:opacity-90 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-lg shadow-blue-500/20 transition-all active:scale-95"
                         >
-                            Start a new one
+                            Find People
                         </button>
                     </div>
                 ) : (
-                    <div className="space-y-0.5 pb-20">
-                        {filteredConversations.map((conv) => (
-                            <ConversationItem
-                                key={conv._id}
-                                conversation={conv}
-                                isSelected={selectedId === conv._id}
-                                onClick={() => onSelectConversation(conv._id)}
-                                currentUser={currentUser}
-                            />
-                        ))}
-                    </div>
+                    filteredConversations.map((conv) => (
+                        <ConversationItem
+                            key={conv._id}
+                            conversation={conv}
+                            isSelected={selectedId === conv._id}
+                            onClick={() => onSelectConversation(conv._id)}
+                            currentUser={currentUser}
+                        />
+                    ))
                 )}
             </div>
         </div>
     );
 }
+

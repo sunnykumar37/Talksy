@@ -17,7 +17,7 @@ export const sendMessage = mutation({
             content: args.content,
             createdAt: Date.now(),
             deleted: false,
-            seenBy: [user._id], // Sender has seen it
+            seenBy: [user._id as string], // Sender has seen it
         });
 
 
@@ -64,8 +64,10 @@ export const getMessages = query({
             )
             .collect();
 
-        // Filter out messages deleted "for me"
-        return messages.filter(m => !m.deletedFor?.includes(user._id));
+        // Hide messages that were deleted for everyone or just for this user
+        return messages.filter(
+            (m) => !m.deleted && !(m.deletedFor?.includes(user._id))
+        );
     }
 });
 
@@ -83,9 +85,9 @@ export const deleteForEveryone = mutation({
             throw new Error("Unauthorized: Only sender can delete for everyone");
         }
 
+        // Mark as deleted for everyone; getMessages will now hide it entirely
         await ctx.db.patch(args.messageId, {
             deleted: true,
-            content: "This message was deleted",
         });
     },
 });
@@ -134,9 +136,10 @@ export const markAsSeen = mutation({
             .collect();
 
         for (const message of messages) {
-            if (!message.seenBy.includes(user._id)) {
+            const seenBy = message.seenBy ?? [];
+            if (!seenBy.includes(user._id as string)) {
                 await ctx.db.patch(message._id, {
-                    seenBy: [...message.seenBy, user._id],
+                    seenBy: [...seenBy, user._id as string],
                 });
             }
         }

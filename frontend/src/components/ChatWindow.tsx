@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { ArrowLeft, Send, Trash2 } from "lucide-react";
 import { Id } from "@convex/_generated/dataModel";
+import { formatDateHeader } from "@/lib/utils";
 
 interface ChatWindowProps {
   conversationId: Id<"conversations">;
@@ -128,73 +129,97 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
 
   return (
     <div className="flex flex-col h-full bg-[var(--background)] relative overflow-hidden transition-all duration-300">
-      {/* Premium Sticky Header */}
-      <div className="p-4 px-6 border-b border-[var(--card-border)] glass-morphism sticky top-0 z-30 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-4 group cursor-pointer">
-          <button onClick={onBack} className="md:hidden p-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-all duration-300">
+      {/* Header - Standardized Height & Centered Content */}
+      <div className="h-[88px] px-6 border-b border-[var(--card-border)] glass-morphism sticky top-0 z-40 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-4 group cursor-pointer h-full">
+          <button onClick={onBack} className="md:hidden p-2 text-[var(--muted)] hover:bg-[var(--card-border)] rounded-full transition-all duration-300">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="relative group/avatar">
-            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 ring-2 ring-white dark:ring-slate-900 overflow-hidden shadow-md transition-all duration-300 group-hover/avatar:scale-110 group-hover/avatar:rotate-3">
-              {otherUser?.imageUrl ? (
-                <img src={otherUser.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-slate-200 dark:bg-slate-700">
-                  <span className="text-slate-400 font-bold">{conversation.isGroup ? "G" : (otherUser?.name?.charAt(0) || "?")}</span>
-                </div>
+
+          <div className="flex items-center gap-4 py-2">
+            <div className="relative group/avatar">
+              <div className="w-12 h-12 rounded-full bg-[var(--card)] ring-2 ring-[var(--card-border)] overflow-hidden shadow-xl transition-all duration-300 group-hover/avatar:scale-105">
+                {otherUser?.imageUrl ? (
+                  <img src={otherUser.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-[var(--input)]">
+                    <span className="text-[var(--muted)] font-black">{conversation.isGroup ? "G" : (otherUser?.name?.charAt(0) || "?")}</span>
+                  </div>
+                )}
+              </div>
+              {!conversation.isGroup && otherUser?.isOnline && (
+                <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[var(--card)] shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
               )}
             </div>
-            {!conversation.isGroup && otherUser?.isOnline && (
-              <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-900 shadow-sm" />
-            )}
-          </div>
-          <div>
-            <div className="text-lg font-bold text-[var(--foreground)] leading-tight tracking-tight group-hover:text-blue-600 transition-colors">
-              {conversation.isGroup ? conversation.name : otherUser?.name || "..."}
-            </div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              {!conversation.isGroup && otherUser?.isOnline && <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />}
-              <div className={`text-[11px] font-bold uppercase tracking-widest ${otherUser?.isOnline ? 'text-green-500' : 'text-slate-400 dark:text-slate-500'}`}>
-                {conversation.isGroup ? `${conversation.members.length} members` : (otherUser?.isOnline ? "Active Now" : "Last seen recently")}
+
+            <div className="flex flex-col justify-center">
+              <div className="text-lg font-black text-[var(--foreground)] leading-tight tracking-tighter group-hover:text-[var(--accent)] transition-colors">
+                {conversation.isGroup ? conversation.name : otherUser?.name || "..."}
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <div className={`text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border ${otherUser?.isOnline ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/5' : 'text-[var(--muted)] border-[var(--card-border)]'}`}>
+                  {conversation.isGroup ? `${conversation.members.length} members` : (otherUser?.isOnline ? "Active Now" : "Offline")}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Messages Stream - Subtle Gradient Background */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col custom-scrollbar bg-gradient-to-b from-[var(--background)] to-[var(--background)] relative">
+
+      {/* Messages Stream - Subtle Layered Background */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col custom-scrollbar relative bg-[var(--background)] bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.05),_transparent_60%)]">
         {messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center flex-col text-slate-300 dark:text-slate-700 animate-in fade-in zoom-in duration-500">
             <div className="w-20 h-20 bg-[var(--card)] rounded-full flex items-center justify-center mb-6 shadow-inner ring-4 ring-white dark:ring-slate-800">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
             </div>
-            <p className="text-base font-bold text-slate-400 dark:text-slate-500">Start your premium conversation</p>
-            <p className="text-xs text-slate-300 dark:text-slate-600 mt-1 uppercase tracking-widest">Messages are end-to-end synced</p>
+            <p className="text-base font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Start your premium conversation</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {messages.map((m) => (
-              <MessageBubble
-                key={m._id}
-                message={m}
-                currentUser={currentUser}
-              />
-            ))}
+          <div className="space-y-1">
+            {messages.map((m, index) => {
+              const prevMsg = messages[index - 1];
+              const nextMsg = messages[index + 1];
+              const isFirstInGroup = !prevMsg || prevMsg.senderId !== m.senderId;
+              const isLastInGroup = !nextMsg || nextMsg.senderId !== m.senderId;
+
+              const currentDate = new Date(m.createdAt).toDateString();
+              const previousDate = prevMsg ? new Date(prevMsg.createdAt).toDateString() : null;
+              const showDateHeader = !prevMsg || currentDate !== previousDate;
+
+              return (
+                <div key={m._id}>
+                  {showDateHeader && (
+                    <div className="flex justify-center my-6">
+                      <span className="px-4 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-[var(--muted)] bg-[var(--card)] border border-[var(--card-border)] rounded-full">
+                        {formatDateHeader(m.createdAt)}
+                      </span>
+                    </div>
+                  )}
+                  <MessageBubble
+                    message={m}
+                    currentUser={currentUser}
+                    isFirstInGroup={isFirstInGroup}
+                    isLastInGroup={isLastInGroup}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
         <div ref={messagesEndRef} className="h-4" />
       </div>
 
       {/* Typing Indicator */}
-      <div className={`px-8 py-3 bg-gradient-to-t from-[var(--background)] to-transparent absolute bottom-[92px] left-0 right-0 z-20 transition-all duration-300 ease-in-out ${otherTypingUsers.length > 0 ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
-        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-xs font-bold italic drop-shadow-sm">
-          <div className="flex gap-1 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-full shadow-sm">
-            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+      <div className={`px-8 py-3 bg-gradient-to-t from-[var(--background)] to-transparent absolute bottom-[104px] left-0 right-0 z-20 transition-all duration-300 ease-in-out ${otherTypingUsers.length > 0 ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}`}>
+        <div className="flex items-center gap-2 text-[var(--accent)] text-[10px] font-black italic uppercase tracking-widest drop-shadow-sm">
+          <div className="flex gap-1.5 bg-[var(--accent)]/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-[var(--accent)]/20 shadow-lg">
+            <div className="w-1 h-1 bg-[var(--accent)] rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+            <div className="w-1 h-1 bg-[var(--accent)] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+            <div className="w-1 h-1 bg-[var(--accent)] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
           </div>
-          <span className="bg-[var(--card)]/80 backdrop-blur-sm px-2 py-1 rounded-lg">
+          <span className="bg-[var(--card)]/90 border border-[var(--card-border)] backdrop-blur-md px-3 py-1.5 rounded-xl shadow-xl">
             {otherTypingUsers.length === 1
               ? `${otherTypingUsers[0]} is typing...`
               : `${otherTypingUsers.length} people are typing...`}
@@ -202,10 +227,10 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
         </div>
       </div>
 
-      {/* Premium Input Section */}
-      <div className="p-4 md:p-6 bg-[var(--card)] border-t border-[var(--card-border)] sticky bottom-0 z-30 shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+      {/* Premium Input Section - Anchored & Depth */}
+      <div className="p-5 md:p-6 bg-[var(--card)] border-t border-[var(--card-border)] sticky bottom-0 z-30 shadow-[0_-12px_40px_rgba(0,0,0,0.08)]">
         <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-end gap-4">
-          <div className="flex-1 bg-[var(--input)] hover:bg-slate-200/50 dark:hover:bg-slate-800/50 focus-within:bg-[var(--card)] focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-100 dark:focus-within:border-blue-900 border border-transparent rounded-2xl transition-all duration-300 shadow-inner px-5 py-2.5 flex items-center min-h-[52px] group/input">
+          <div className="flex-1 bg-[var(--input)] hover:bg-[var(--input)]/80 focus-within:bg-[var(--background)] focus-within:ring-2 focus-within:ring-[var(--accent)]/30 border border-[var(--card-border)] rounded-[28px] transition-all duration-300 shadow-inner px-6 py-3 flex items-center min-h-[56px] group/input">
             <textarea
               rows={1}
               value={content}
@@ -216,19 +241,21 @@ export function ChatWindow({ conversationId, onBack, currentUser }: ChatWindowPr
                   handleSend(e);
                 }
               }}
-              placeholder="Type a modern message..."
-              className="flex-1 bg-transparent border-none outline-none text-[var(--foreground)] placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm md:text-base resize-none py-1 group-focus-within/input:placeholder:text-blue-300"
+              placeholder="Message your partner..."
+              className="flex-1 bg-transparent border-none outline-none text-[var(--foreground)] placeholder:text-[var(--muted)] text-sm md:text-base resize-none py-1.5 group-focus-within/input:placeholder:text-[var(--accent)]/50"
             />
           </div>
 
           <button
             type="submit"
             disabled={!content.trim()}
-            className="bg-blue-600 text-white p-4 rounded-2xl hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 transition-all duration-300 shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)] hover:shadow-[0_15px_25px_-5px_rgba(37,99,235,0.5)] disabled:shadow-none hover:scale-110 active:scale-90 group/btn shrink-0 border border-blue-500/20"
+            className={`p-4 rounded-full transition-all duration-300 shadow-2xl active:scale-90 flex items-center justify-center ${content.trim()
+              ? "bg-[var(--accent)] text-white hover:opacity-90 hover:scale-110 hover:-rotate-12 cursor-pointer shadow-blue-500/40"
+              : "bg-[var(--input)] text-[var(--muted)] cursor-not-allowed opacity-50"
+              }`}
           >
-            <Send className="w-6 h-6 group-hover/btn:rotate-12 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+            <Send className={`w-5 h-5 ${content.trim() ? "translate-x-0.5 -translate-y-0.5" : ""}`} />
           </button>
-
         </form>
       </div>
     </div>

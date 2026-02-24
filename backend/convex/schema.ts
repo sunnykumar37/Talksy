@@ -31,7 +31,7 @@ export default defineSchema({
         createdAt: v.number(),
         deleted: v.boolean(), // for "Delete for Everyone"
         deletedFor: v.optional(v.array(v.string())), // Array of user IDs who deleted this for themselves
-        seenBy: v.array(v.string()), // Array of user IDs who have seen this message
+        seenBy: v.optional(v.array(v.string())), // Array of user IDs who have seen this message
     }).index("by_conversationId", ["conversationId"]),
 
 
