@@ -10,24 +10,37 @@ interface ConversationItemProps {
     isSelected: boolean;
     onClick: () => void;
     currentUser: any;
+    search?: string;
 }
 
-export function ConversationItem({ conversation, isSelected, onClick, currentUser }: ConversationItemProps) {
+export function ConversationItem({ conversation, isSelected, onClick, currentUser, search }: ConversationItemProps) {
     // Find the other member in a 1-on-1 chat
     const otherMemberId = conversation.members.find((id: string) => id !== currentUser?._id);
     // This is a simplified approach, usually you'd fetch the other user's info
     // In a real app, you might want to denormalize some data or do a join
     // For now, let's assume we have a query to get basic user info by ID
     const otherUser = useQuery(api.users.getUserById, { userId: otherMemberId });
-    const lastMessage = useQuery(api.messages.getLastMessage, { conversationId: conversation._id });
 
-    const name = conversation.isGroup ? conversation.name : otherUser?.name || "Loading...";
-    const imageUrl = conversation.isGroup ? "/group-avatar.png" : otherUser?.imageUrl || "";
+    const unreadCount: number = conversation.unreadCount ?? 0;
+
+    // Apply search filtering using conversation name or other user's name
+    const searchTerm = (search || "").trim().toLowerCase();
+    if (searchTerm) {
+        const conversationName = (conversation.name || "").toLowerCase();
+        const otherName = (otherUser?.name || "").toLowerCase();
+        const matches =
+            conversationName.includes(searchTerm) ||
+            otherName.includes(searchTerm);
+
+        if (!matches) {
+            return null;
+        }
+    }
 
     return (
         <div
             onClick={onClick}
-            className={`px-3 py-3 md:px-4 md:py-3 mx-2 my-0.5 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden ${
+            className={`px-3 py-3 md:px-4 md:py-3 ml-2 mr-4 my-0.5 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden ${
                 isSelected
                     ? "bg-[var(--accent)] text-white shadow-lg"
                     : "bg-transparent hover:bg-[var(--card-border)]/50"
@@ -71,15 +84,28 @@ export function ConversationItem({ conversation, isSelected, onClick, currentUse
                         >
                             {conversation.isGroup ? conversation.name : otherUser?.name || "..."}
                         </h3>
-                        {conversation.lastMessageTime && (
-                            <span
-                                className={`text-[10px] ml-2 flex-shrink-0 ${
-                                    isSelected ? "text-white/80" : "text-[var(--muted)]"
-                                }`}
-                            >
-                                {formatShortTimestamp(conversation.lastMessageTime)}
-                            </span>
-                        )}
+                        <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+                            {conversation.lastMessageTime && (
+                                <span
+                                    className={`text-[10px] ${
+                                        isSelected ? "text-white/80" : "text-[var(--muted)]"
+                                    }`}
+                                >
+                                    {formatShortTimestamp(conversation.lastMessageTime)}
+                                </span>
+                            )}
+                            {unreadCount > 0 && (
+                                <span
+                                    className={`ml-1 min-w-[18px] h-[18px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                                        isSelected
+                                            ? "bg-white text-[var(--accent)]"
+                                            : "bg-[var(--accent)] text-white"
+                                    }`}
+                                >
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
+                        </div>
                     </div>
                     <p
                         className={`text-xs truncate ${

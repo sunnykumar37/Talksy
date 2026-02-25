@@ -1,13 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  /* Slate 50 */
+  /* Light theme - higher contrast between surfaces */
+  --background: #f9fafb;
+  /* Base app background (lighter) */
   --foreground: #0f172a;
-  /* Slate 900 */
-  --card: #ffffff;
-  --card-border: #f1f5f9;
-  --input: #f1f5f9;
+  /* Text color */
+  --card: #e5e7eb;
+  /* Sidebar / panels grey */
+  --card-border: #d4d4d8;
+  /* Stronger border for definition */
+  --input: #f3f4f6;
   --accent: #2563eb;
   --muted: #64748b;
   --bubble-me: #dbeafe;

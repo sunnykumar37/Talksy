@@ -21,11 +21,6 @@ export function Sidebar({ onSelectConversation, selectedId, onOpenUserList, curr
     const [search, setSearch] = useState("");
     const conversations = useQuery(api.conversations.getUserConversations);
 
-    const filteredConversations = conversations?.filter((c) => {
-        if (!search) return true;
-        return c.name?.toLowerCase().includes(search.toLowerCase());
-    });
-
     return (
         <div className="w-full md:w-80 lg:w-96 flex flex-col h-full bg-[var(--card)] border-r border-[var(--card-border)] relative overflow-hidden group/sidebar">
             {/* Subtle Neon Edge Glow */}
@@ -53,17 +48,18 @@ export function Sidebar({ onSelectConversation, selectedId, onOpenUserList, curr
             {/* Scanline / Grain Overlay for depth (optional but adds texture) */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-            <div className="p-3 mt-1">
+            {/* Search bar aligned with conversation items (same inset) */}
+            <div className="px-7 pt-3 pb-2">
                 <SearchBar value={search} onChange={setSearch} placeholder="Search messages..." />
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10 p-2 space-y-1">
-                {filteredConversations === undefined ? (
+                {conversations === undefined ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <div className="w-12 h-12 border-4 border-[var(--accent)]/30 border-t-[var(--accent)] rounded-full animate-spin shadow-lg" />
                         <p className="text-xs font-black uppercase tracking-widest text-[var(--muted)] animate-pulse">Syncing Conversations</p>
                     </div>
-                ) : filteredConversations.length === 0 ? (
+                ) : !conversations || conversations.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-8 py-20 text-center glass-morphism rounded-3xl mx-2 border border-[var(--card-border)] shadow-xl">
                         <div className="w-16 h-16 bg-[var(--input)] rounded-full flex items-center justify-center mb-4 ring-1 ring-[var(--card-border)]">
                             <Plus className="w-8 h-8 text-[var(--muted)]" />
@@ -78,13 +74,14 @@ export function Sidebar({ onSelectConversation, selectedId, onOpenUserList, curr
                         </button>
                     </div>
                 ) : (
-                    filteredConversations.map((conv) => (
+                    conversations.map((conv) => (
                         <ConversationItem
                             key={conv._id}
                             conversation={conv}
                             isSelected={selectedId === conv._id}
                             onClick={() => onSelectConversation(conv._id)}
                             currentUser={currentUser}
+                            search={search}
                         />
                     ))
                 )}

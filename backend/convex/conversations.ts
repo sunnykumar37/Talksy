@@ -88,11 +88,44 @@ export const getUserConversations = query({
 
         console.log("getUserConversations: Total conversations found in DB", conversations.length);
 
-
         // Filter conversations where the user is a member and sort by updatedAt
-        return conversations
+        const userConversations = conversations
             .filter((c) => c.members.includes(user._id))
             .sort((a, b) => b.updatedAt - a.updatedAt);
+
+        // For each conversation, compute last message + unread count
+        const enriched = await Promise.all(
+            userConversations.map(async (conversation) => {
+                const messages = await ctx.db
+                    .query("messages")
+                    .withIndex("by_conversationId", (q) =>
+                        q.eq("conversationId", conversation._id)
+                    )
+                    .order("desc")
+                    .collect();
+
+                // Apply same visibility rules as getMessages
+                const visibleMessages = messages.filter(
+                    (m) => !m.deleted && !(m.deletedFor?.includes(user._id))
+                );
+
+                const lastMessage = visibleMessages[0];
+
+                const unreadCount = visibleMessages.filter((m) => {
+                    const seenBy = m.seenBy ?? [];
+                    return !seenBy.includes(user._id as string);
+                }).length;
+
+                return {
+                    ...conversation,
+                    lastMessageContent: lastMessage?.content ?? null,
+                    lastMessageTime: lastMessage?.createdAt ?? null,
+                    unreadCount,
+                };
+            })
+        );
+
+        return enriched;
     },
 });
 
