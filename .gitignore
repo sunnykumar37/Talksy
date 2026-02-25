@@ -25,7 +25,6 @@ dist/
 
 # Convex
 .convex/
-_generated/
 
 # OS Specific
 .DS_Store
@@ -39,7 +38,6 @@ Thumbs.db
 *.swo
 
 # Project specific
-backend/convex/_generated/
 frontend/.next/
 frontend/out/
 frontend/build/
