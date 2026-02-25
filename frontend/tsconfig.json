@@ -20,6 +20,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@convex/_generated/*": ["../backend/convex/_generated/*"],
       "@convex/*": ["../backend/convex/*"]
     }
 
