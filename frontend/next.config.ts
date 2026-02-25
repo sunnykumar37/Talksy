@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-// Use default Next.js config; Lightning CSS binary is handled via postinstall patch
+// Minimal config – rely on Next.js defaults
 const nextConfig: NextConfig = {};
 
 export default nextConfig;
