@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    // Disable Lightning CSS when using webpack to avoid native binary issues on Vercel
+    // Disable Turbopack and Lightning CSS to avoid native binary issues on Vercel
+    turbo: false,
     useLightningcss: false,
   },
 };
