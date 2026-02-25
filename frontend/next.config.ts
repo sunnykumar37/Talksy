@@ -1,11 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  experimental: {
-    // Disable Turbopack and Lightning CSS to avoid native binary issues on Vercel
-    turbo: false,
-    useLightningcss: false,
-  },
-};
+// Use default Next.js config; Lightning CSS binary is handled via postinstall patch
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
