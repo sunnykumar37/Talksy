@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
-// Minimal config – rely on Next.js defaults
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  experimental: {
+    // Disable Lightning CSS when using webpack; fall back to PostCSS
+    useLightningcss: false,
+  },
+};
 
 export default nextConfig;
